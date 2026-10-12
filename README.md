@@ -171,7 +171,16 @@ As capturas de tela do dashboard devem ser armazenadas em `docs/imagens/`.
 Após adicionar as imagens ao repositório, elas podem ser exibidas aqui, por exemplo:
 
 ```markdown
-![Visão geral do dashboard](docs/imagens/dashboard-visao-geral.png)
+![Visão geral do dashboard](docs/imagens/dashboard_visao_geral.png)
+```
+```markdown
+![Gráfico Leituras por Hora do Dia](docs/imagens/grafico_hora_dia.png)
+```
+```markdown
+![Gráfico Média de Temperatura por Localização](docs/imagens/grafico_media_temp_localiz.png)
+```
+```markdown
+![Gráfico Temperaturas Máximas e Mínimas por Dia](docs/imagens/grafico_temp_max_min.png)
 ```
 
 ## 12. Comandos Git
