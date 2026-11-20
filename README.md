@@ -1,23 +1,23 @@
-# Pipeline de Dados IoT — Análise de Temperatura
+# IoT Data Pipeline — Temperature Analysis
 
-## 1. Sobre o projeto
+## 1. About the Project
 
-Este projeto implementa um pipeline de dados para processar leituras de temperatura de dispositivos IoT, armazená-las em um banco de dados PostgreSQL e apresentar os resultados em um dashboard interativo.
+This project implements a data pipeline to process temperature readings collected from IoT devices, store them in a PostgreSQL database, and present the results through an interactive dashboard.
 
-O objetivo é praticar as etapas de extração, transformação e carregamento (ETL), consultas SQL e visualização de dados.
+The goal is to practice Extract, Transform, Load (ETL) processes, SQL queries, and data visualization.
 
-## 2. Tecnologias utilizadas
+## 2. Technologies Used
 
-- **Python:** processamento e integração dos dados.
-- **Pandas:** manipulação e transformação do dataset.
-- **PostgreSQL:** armazenamento dos dados.
-- **Docker e Docker Compose:** execução do banco de dados em container.
-- **Streamlit:** construção do dashboard.
-- **Plotly:** visualizações interativas.
-- **Psycopg2:** conexão entre Python e PostgreSQL.
-- **python-dotenv:** leitura das configurações do ambiente.
+- **Python:** data processing and integration.
+- **Pandas:** dataset manipulation and transformation.
+- **PostgreSQL:** data storage.
+- **Docker and Docker Compose:** running the database in a container.
+- **Streamlit:** dashboard development.
+- **Plotly:** interactive data visualizations.
+- **Psycopg2:** connection between Python and PostgreSQL.
+- **python-dotenv:** environment configuration management.
 
-## 3. Estrutura do projeto
+## 3. Project Structure
 
 ```text
 pipeline-iot-temperatura/
@@ -40,160 +40,159 @@ pipeline-iot-temperatura/
 
 ## 4. Dataset
 
-O projeto utiliza o dataset **Temperature Readings: IoT Devices**, disponível no Kaggle:
+This project uses the **Temperature Readings: IoT Devices** dataset, available on Kaggle:
 
 https://www.kaggle.com/datasets/atulanandjha/temperature-readings-iot-devices
 
-O arquivo CSV contém leituras de temperatura, data e hora, identificação do registro, ambiente e indicação de localização interna ou externa.
+The CSV file contains temperature readings, date and time information, record IDs, environment data, and an indication of whether the readings were collected indoors or outdoors.
 
-Para executar o projeto, coloque o arquivo `IOT-temp.csv` dentro da pasta `data/`.
+To run the project, place the `IOT-temp.csv` file inside the `data/` directory.
 
-## 5. Configuração do ambiente
+## 5. Environment Setup
 
-### Pré-requisitos
+### Prerequisites
 
-- Python instalado
-- Docker Desktop instalado e em execução
-- Git instalado
+- Python installed
+- Docker Desktop installed and running
+- Git installed
 
-### Configuração das variáveis de ambiente
+### Environment Variables Configuration
 
-Crie uma cópia do arquivo `.env.example` com o nome `.env`.
+Create a copy of the `.env.example` file and name it `.env`.
 
-No Windows CMD, execute:
+On Windows CMD, run:
 
 ```bat
 copy .env.example .env
 ```
 
-Edite o arquivo `.env` e configure as variáveis necessárias para a conexão com o PostgreSQL. Utilize valores locais e uma senha própria. 
+Edit the `.env` file and configure the required PostgreSQL connection variables. Use local values and set your own password.
 
-### Instalação das dependências
+### Installing Dependencies
 
-Na pasta raiz do projeto, crie e ative o ambiente virtual, caso ainda não exista:
+From the project's root directory, create and activate a virtual environment if it does not already exist:
 
 ```bat
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-Instale as dependências:
+Install the dependencies:
 
 ```bat
 python -m pip install -r requirements.txt
 ```
 
-## 6. Execução do PostgreSQL com Docker
+## 6. Running PostgreSQL with Docker
 
-Inicie o container:
+Start the container:
 
 ```bat
 docker compose up -d
 ```
 
-Verifique o estado dos serviços:
+Check the status of the services:
 
 ```bat
 docker compose ps
 ```
 
-O PostgreSQL ficará disponível na porta configurada em `.env`.
+PostgreSQL will be available on the port configured in `.env`.
 
-## 7. Criação da tabela e das views
+## 7. Creating the Table and Views
 
-Execute os scripts SQL no PostgreSQL. Os valores de usuário e banco nos comandos abaixo devem corresponder aos configurados no seu `.env`.
+Execute the SQL scripts in PostgreSQL. The database and user values in the commands below must match those configured in your `.env` file.
 
-Criação da tabela:
+Create the table:
 
 ```bat
 docker exec -i postgres-iot psql -U iot_user -d iot_db < sql\create_table.sql
 ```
 
-Criação das views:
+Create the views:
 
 ```bat
 docker exec -i postgres-iot psql -U iot_user -d iot_db < sql\views.sql
 ```
 
-Os scripts criam a tabela `temperature_readings` e as views:
+The scripts create the `temperature_readings` table and the following views:
 
 - `vw_temperatura_diaria`
 - `vw_temperatura_diaria_localizacao`
 - `vw_classificacao_temperatura`
 
-## 8. Execução do pipeline ETL
+## 8. Running the ETL Pipeline
 
-Com o PostgreSQL em execução e a tabela criada, execute:
+With PostgreSQL running and the table created, execute:
 
 ```bat
 python src\ingest.py
 ```
 
-O pipeline realiza as seguintes etapas:
+The pipeline performs the following steps:
 
-1. **Extração:** leitura do arquivo CSV.
-2. **Transformação:** remoção de registros duplicados e conversão dos campos.
-3. **Carga:** inserção dos registros no PostgreSQL.
+1. **Extraction:** reads the CSV file.
+2. **Transformation:** removes duplicate records and converts data fields.
+3. **Loading:** inserts the records into PostgreSQL.
 
-A carga utiliza `ON CONFLICT DO NOTHING` para evitar reinserções de registros com IDs já existentes.
+The loading process uses `ON CONFLICT DO NOTHING` to prevent records with existing IDs from being inserted again.
 
-## 9. Execução do dashboard
+## 9. Running the Dashboard
 
-Após carregar os dados e criar as views, execute:
+After loading the data and creating the views, execute:
 
 ```bat
 python -m streamlit run src/dashboard.py
 ```
 
-O Streamlit disponibilizará o endereço local do dashboard no terminal. Abra esse endereço no navegador.
+Streamlit will provide the local dashboard URL in the terminal. Open this URL in your browser.
 
-O dashboard apresenta:
+The dashboard provides:
 
-- Filtros por período.
-- Total de leituras.
-- Temperatura média e máxima.
-- Evolução diária da temperatura média.
-- Quantidade de leituras por hora.
-- Temperaturas máximas e mínimas por dia.
-- Comparação de temperaturas por localização.
-- Média de temperatura em ambientes internos e externos.
+- Date range filters.
+- Total number of readings.
+- Average and maximum temperatures.
+- Daily average temperature trends.
+- Number of readings by hour.
+- Daily maximum and minimum temperatures.
+- Temperature comparisons by location.
+- Average temperature comparison between indoor and outdoor environments.
 
-## 10. Consultas SQL
+## 10. SQL Queries
 
-Os scripts SQL estão disponíveis na pasta `sql/`.
+The SQL scripts are available in the `sql/` directory.
 
-As views permitem resumir as leituras por dia, comparar os tipos de localização e classificar as temperaturas em faixas baixa, moderada e alta.
+The views allow temperature readings to be summarized by day, different location types to be compared, and temperatures to be classified into low, moderate, and high ranges.
 
-## 11. Imagens do dashboard
+## 11. Dashboard Screenshots
 
-![Visão geral do dashboard](docs/imagens/dashboard_visao_geral.png)
+![Dashboard Overview](docs/imagens/dashboard_visao_geral.png)
 
-![Gráfico Leituras por Hora do Dia](docs/imagens/grafico_hora_dia.png)
+![Readings by Hour of the Day Chart](docs/imagens/grafico_hora_dia.png)
 
-![Gráfico Média de Temperatura por Localização](docs/imagens/grafico_media_temp_localiz.png)
+![Average Temperature by Location Chart](docs/imagens/grafico_media_temp_localiz.png)
 
-![Gráfico Temperaturas Máximas e Mínimas por Dia](docs/imagens/grafico_temp_max_min.png)
+![Daily Maximum and Minimum Temperatures Chart](docs/imagens/grafico_temp_max_min.png)
 
-## 12. Comandos Git
+## 12. Git Commands
 
-Para verificar os arquivos modificados:
+To check modified files:
 
 ```bat
 git status
 ```
 
-Para adicionar os arquivos e criar um commit:
+To stage the files and create a commit:
 
 ```bat
 git add .
-git commit -m "Documenta pipeline IoT e dashboard"
+git commit -m "Document IoT pipeline and dashboard"
 ```
 
-Para publicar no GitHub, configure o repositório remoto e envie os commits para a branch principal.
+To publish the project on GitHub, configure the remote repository and push the commits to the main branch.
 
-**Importante:** confirme que `.env`, `.venv/` e outros arquivos privados estão excluídos antes de executar `git add .`.
+**Important:** Make sure `.env`, `.venv/`, and other private files are excluded before running `git add .`.
 
+## 13. Author
 
-## 13. Autor
-
-Projeto acadêmico desenvolvido para praticar engenharia de dados, integração com PostgreSQL, Docker, Python e visualização de dados.
+Academic project developed to practice data engineering, PostgreSQL integration, Docker, Python, and data visualization.
